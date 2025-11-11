@@ -49,6 +49,41 @@ const PermitCompliance = () => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handleQuickUpload = async (permitNumber: string) => {
+    if (uploadedFiles.length === 0) {
+      toast({
+        title: "No Files Selected",
+        description: "Please select files to upload",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Upload each file
+      for (const file of uploadedFiles) {
+        await uploadDocument(file, permitNumber);
+      }
+
+      toast({
+        title: "Documents Uploaded",
+        description: "Your compliance documents have been uploaded successfully"
+      });
+
+      // Reset files
+      setUploadedFiles([]);
+    } catch (error) {
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload documents",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleSubmitReport = async () => {
     if (!selectedReport || !reportType || !reportPeriod) {
       toast({
@@ -228,7 +263,7 @@ const PermitCompliance = () => {
                               </div>
 
                               <Button 
-                                onClick={handleSubmitReport} 
+                                onClick={() => handleQuickUpload(report.permitNumber)} 
                                 disabled={isSubmitting || uploadedFiles.length === 0}
                                 className="w-full"
                               >
