@@ -49,41 +49,6 @@ const PermitCompliance = () => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleQuickUpload = async (permitNumber: string) => {
-    if (uploadedFiles.length === 0) {
-      toast({
-        title: "No Files Selected",
-        description: "Please select files to upload",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      // Upload each file
-      for (const file of uploadedFiles) {
-        await uploadDocument(file, permitNumber);
-      }
-
-      toast({
-        title: "Documents Uploaded",
-        description: "Your compliance documents have been uploaded successfully"
-      });
-
-      // Reset files
-      setUploadedFiles([]);
-    } catch (error) {
-      toast({
-        title: "Upload Failed",
-        description: "Failed to upload documents",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleSubmitReport = async () => {
     if (!selectedReport || !reportType || !reportPeriod) {
       toast({
@@ -203,80 +168,9 @@ const PermitCompliance = () => {
                         </Button>
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Upload className="w-4 h-4 mr-2" />
-                              Quick Upload
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-md">
-                            <DialogHeader>
-                              <DialogTitle>Upload Compliance Document</DialogTitle>
-                              <DialogDescription>
-                                Upload compliance report documents for {report.permitNumber}
-                              </DialogDescription>
-                            </DialogHeader>
-                            
-                            <div className="space-y-4 py-4">
-                              <div className="space-y-2">
-                                <Label>Upload Documents</Label>
-                                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                                  <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                                  <p className="text-sm text-muted-foreground mb-2">
-                                    Upload compliance reports and supporting documents
-                                  </p>
-                                  <input
-                                    type="file"
-                                    multiple
-                                    onChange={handleFileChange}
-                                    className="hidden"
-                                    id={`quick-upload-${report.id}`}
-                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-                                  />
-                                  <Label htmlFor={`quick-upload-${report.id}`}>
-                                    <Button variant="outline" type="button" asChild>
-                                      <span>
-                                        <FileText className="w-4 h-4 mr-2" />
-                                        Choose Files
-                                      </span>
-                                    </Button>
-                                  </Label>
-                                </div>
-                                
-                                {uploadedFiles.length > 0 && (
-                                  <div className="mt-4 space-y-2">
-                                    <Label className="text-sm font-medium">Selected Files:</Label>
-                                    {uploadedFiles.map((file, index) => (
-                                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                                        <span className="text-sm truncate flex-1">{file.name}</span>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={() => removeFile(index)}
-                                          type="button"
-                                        >
-                                          <X className="h-4 w-4" />
-                                        </Button>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-
-                              <Button 
-                                onClick={() => handleQuickUpload(report.permitNumber)} 
-                                disabled={isSubmitting || uploadedFiles.length === 0}
-                                className="w-full"
-                              >
-                                {isSubmitting ? "Uploading..." : "Upload Documents"}
-                              </Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                        <Dialog>
-                          <DialogTrigger asChild>
                             <Button size="sm" onClick={() => setSelectedReport(report)}>
                               <Upload className="w-4 h-4 mr-2" />
-                              Submit Full Report
+                              Submit Report
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
