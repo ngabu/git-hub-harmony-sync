@@ -929,6 +929,48 @@ export type Database = {
           },
         ]
       }
+      inspections: {
+        Row: {
+          completed_date: string | null
+          created_at: string
+          findings: string | null
+          id: string
+          inspection_type: string
+          inspector_id: string | null
+          notes: string | null
+          permit_application_id: string
+          scheduled_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_date?: string | null
+          created_at?: string
+          findings?: string | null
+          id?: string
+          inspection_type: string
+          inspector_id?: string | null
+          notes?: string | null
+          permit_application_id: string
+          scheduled_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_date?: string | null
+          created_at?: string
+          findings?: string | null
+          id?: string
+          inspection_type?: string
+          inspector_id?: string | null
+          notes?: string | null
+          permit_application_id?: string
+          scheduled_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       intent_registration_drafts: {
         Row: {
           activity_description: string | null
