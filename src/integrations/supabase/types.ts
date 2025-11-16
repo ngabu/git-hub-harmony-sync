@@ -543,6 +543,7 @@ export type Database = {
           email: string | null
           entity_type: string
           id: string
+          is_suspended: boolean | null
           name: string
           phone: string | null
           postal_address: string | null
@@ -560,6 +561,7 @@ export type Database = {
           email?: string | null
           entity_type: string
           id?: string
+          is_suspended?: boolean | null
           name: string
           phone?: string | null
           postal_address?: string | null
@@ -577,6 +579,7 @@ export type Database = {
           email?: string | null
           entity_type?: string
           id?: string
+          is_suspended?: boolean | null
           name?: string
           phone?: string | null
           postal_address?: string | null
@@ -1468,6 +1471,7 @@ export type Database = {
           fee_amount: number | null
           fee_breakdown: Json | null
           forest_product_details: Json | null
+          frozen_reason: string | null
           fuel_storage_details: Json | null
           ghg_emission_details: Json | null
           government_agreements_details: string | null
@@ -1476,6 +1480,7 @@ export type Database = {
           id: string
           infrastructure_details: Json | null
           is_draft: boolean | null
+          is_frozen: boolean | null
           land_clearing_details: Json | null
           landowner_negotiation_status: string | null
           legal_declaration_accepted: boolean | null
@@ -1566,6 +1571,7 @@ export type Database = {
           fee_amount?: number | null
           fee_breakdown?: Json | null
           forest_product_details?: Json | null
+          frozen_reason?: string | null
           fuel_storage_details?: Json | null
           ghg_emission_details?: Json | null
           government_agreements_details?: string | null
@@ -1574,6 +1580,7 @@ export type Database = {
           id?: string
           infrastructure_details?: Json | null
           is_draft?: boolean | null
+          is_frozen?: boolean | null
           land_clearing_details?: Json | null
           landowner_negotiation_status?: string | null
           legal_declaration_accepted?: boolean | null
@@ -1664,6 +1671,7 @@ export type Database = {
           fee_amount?: number | null
           fee_breakdown?: Json | null
           forest_product_details?: Json | null
+          frozen_reason?: string | null
           fuel_storage_details?: Json | null
           ghg_emission_details?: Json | null
           government_agreements_details?: string | null
@@ -1672,6 +1680,7 @@ export type Database = {
           id?: string
           infrastructure_details?: Json | null
           is_draft?: boolean | null
+          is_frozen?: boolean | null
           land_clearing_details?: Json | null
           landowner_negotiation_status?: string | null
           legal_declaration_accepted?: boolean | null
