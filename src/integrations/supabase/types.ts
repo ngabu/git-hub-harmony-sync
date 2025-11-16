@@ -1983,6 +1983,7 @@ export type Database = {
           first_name: string | null
           id: string
           is_active: boolean
+          is_suspended: boolean | null
           last_name: string | null
           must_change_password: boolean | null
           organization: string | null
@@ -1990,6 +1991,9 @@ export type Database = {
           phone: string | null
           staff_position: Database["public"]["Enums"]["staff_position"] | null
           staff_unit: Database["public"]["Enums"]["staff_unit"] | null
+          suspended_at: string | null
+          suspended_by: string | null
+          suspension_reason: string | null
           two_fa_enabled: boolean
           updated_at: string
           user_id: string
@@ -2002,6 +2006,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           is_active?: boolean
+          is_suspended?: boolean | null
           last_name?: string | null
           must_change_password?: boolean | null
           organization?: string | null
@@ -2009,6 +2014,9 @@ export type Database = {
           phone?: string | null
           staff_position?: Database["public"]["Enums"]["staff_position"] | null
           staff_unit?: Database["public"]["Enums"]["staff_unit"] | null
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspension_reason?: string | null
           two_fa_enabled?: boolean
           updated_at?: string
           user_id: string
@@ -2021,6 +2029,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           is_active?: boolean
+          is_suspended?: boolean | null
           last_name?: string | null
           must_change_password?: boolean | null
           organization?: string | null
@@ -2028,6 +2037,9 @@ export type Database = {
           phone?: string | null
           staff_position?: Database["public"]["Enums"]["staff_position"] | null
           staff_unit?: Database["public"]["Enums"]["staff_unit"] | null
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspension_reason?: string | null
           two_fa_enabled?: boolean
           updated_at?: string
           user_id?: string
@@ -2247,6 +2259,14 @@ export type Database = {
       can_update_user_role: {
         Args: { new_role: string; target_user_id: string }
         Returns: boolean
+      }
+      freeze_entity_records: {
+        Args: {
+          entity_id_param: string
+          freeze_reason?: string
+          should_freeze: boolean
+        }
+        Returns: undefined
       }
       generate_secure_password: { Args: never; Returns: string }
       generate_secure_password_v2: { Args: never; Returns: string }
