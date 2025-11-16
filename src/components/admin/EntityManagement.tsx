@@ -107,24 +107,14 @@ export function EntityManagement() {
     try {
       const isSuspending = suspendAction === 'suspend';
 
-      // Update entity suspension status (we'll need to add this column)
-      const { error: entityError } = await supabase
-        .from('entities')
-        .update({ is_suspended: isSuspending })
-        .eq('id', entityToSuspend.id);
+      // Call the database function to freeze/unfreeze all entity records
+      const { error } = await supabase.rpc('freeze_entity_records', {
+        entity_id_param: entityToSuspend.id,
+        should_freeze: isSuspending,
+        freeze_reason: isSuspending ? 'Entity suspended by administrator' : null
+      });
 
-      if (entityError) throw entityError;
-
-      // Suspend/activate user's permits and applications
-      const { error: permitError } = await supabase
-        .from('permit_applications')
-        .update({ 
-          is_frozen: isSuspending,
-          frozen_reason: isSuspending ? 'Entity suspended by admin' : null
-        })
-        .eq('entity_id', entityToSuspend.id);
-
-      if (permitError) throw permitError;
+      if (error) throw error;
 
       toast({
         title: "Success",
