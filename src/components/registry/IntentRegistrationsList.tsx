@@ -9,9 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-import { Loader2, Search, Filter, ChevronLeft, ChevronRight, ChevronDown, ChevronsUpDown, FileDown, Clock, AlertCircle, User, Mail, Calendar } from 'lucide-react';
+import { Loader2, Search, Filter, ChevronLeft, ChevronRight, ChevronDown, ChevronsUpDown, FileDown, Clock, AlertCircle, User, Mail, Calendar, CheckCircle } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
 import { IntentRegistrationReadOnlyView } from '@/components/public/IntentRegistrationReadOnlyView';
@@ -156,10 +157,36 @@ export function IntentRegistrationsList() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved': return 'default';
-      case 'submitted': return 'secondary';
+      case 'pending': return 'secondary';
       case 'rejected': return 'destructive';
       case 'under_review': return 'outline';
       default: return 'outline';
+    }
+  };
+
+  const handleAcceptIntent = async (intentId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const { error } = await supabase
+        .from('intent_registrations')
+        .update({ status: 'under_review' })
+        .eq('id', intentId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: 'Intent registration accepted and moved to under review',
+      });
+      
+      fetchIntents();
+    } catch (error) {
+      console.error('Error accepting intent:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to accept intent registration',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -280,7 +307,7 @@ export function IntentRegistrationsList() {
                 </SelectTrigger>
                 <SelectContent className="bg-background border border-border z-50">
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="submitted">Submitted</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="under_review">Under Review</SelectItem>
                   <SelectItem value="approved">Approved</SelectItem>
                   <SelectItem value="rejected">Rejected</SelectItem>
@@ -320,12 +347,13 @@ export function IntentRegistrationsList() {
               <TableHead>Province</TableHead>
               <TableHead>Created Date</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="w-24 text-center">Accept</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredIntents.length === 0 ? (
               <TableRow className="print:hidden">
-                <TableCell colSpan={7} className="text-center text-muted-foreground">
+                <TableCell colSpan={8} className="text-center text-muted-foreground">
                   {searchTerm || statusFilter !== 'all' || levelFilter !== 'all'
                     ? 'No intent registrations match your search criteria'
                     : 'No intent registrations found'}
@@ -357,13 +385,28 @@ export function IntentRegistrationsList() {
                       <TableCell>{format(new Date(intent.created_at), 'MMM dd, yyyy')}</TableCell>
                       <TableCell>
                         <Badge variant={getStatusColor(intent.status)}>
-                          {intent.status}
+                          {intent.status.replace('_', ' ')}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                        {intent.status === 'pending' ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 gap-2"
+                            onClick={(e) => handleAcceptIntent(intent.id, e)}
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            Accept
+                          </Button>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">-</span>
+                        )}
                       </TableCell>
                     </TableRow>
                     {isExpanded && (
                       <TableRow key={`${intent.id}-details`} className="bg-glass/50 backdrop-blur-md hover:bg-glass/50 print:bg-transparent">
-                        <TableCell colSpan={7} className="p-0 print:p-0">
+                        <TableCell colSpan={8} className="p-0 print:p-0">
                           <div className="border-t border-glass/30 bg-white/80 dark:bg-primary/5 backdrop-blur-md p-6 print:border-none print:p-0 print:bg-transparent print:block">
                             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full print:hidden">
                               <TabsList className="grid w-full grid-cols-2">
