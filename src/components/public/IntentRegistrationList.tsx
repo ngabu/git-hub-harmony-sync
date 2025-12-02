@@ -7,19 +7,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useIntentRegistrations } from '@/hooks/useIntentRegistrations';
 import { useAuth } from '@/contexts/AuthContext';
-import { Building, User, FileText, AlertCircle, CheckCircle, XCircle, Clock, MapPin, DollarSign, ChevronsUpDown, ChevronDown, Calendar, Mail } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Building, User, FileText, AlertCircle, CheckCircle, XCircle, Clock, MapPin, DollarSign, ChevronsUpDown, ChevronDown, Calendar, Mail, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { IntentRegistrationReadOnlyView } from './IntentRegistrationReadOnlyView';
 import { PermitApplicationsMap } from './PermitApplicationsMap';
 
 export function IntentRegistrationList() {
   const { user } = useAuth();
-  const { intents, loading } = useIntentRegistrations(user?.id);
+  const { toast } = useToast();
+  const { intents, loading, refetch } = useIntentRegistrations(user?.id);
   const [selectedIntent, setSelectedIntent] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<string>('details');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [intentToDelete, setIntentToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const filteredIntents = statusFilter === 'all' 
     ? intents 
@@ -31,7 +38,7 @@ export function IntentRegistrationList() {
         return <CheckCircle className="w-4 h-4 text-success" />;
       case 'rejected':
         return <XCircle className="w-4 h-4 text-destructive" />;
-      case 'submitted':
+      case 'pending':
         return <Clock className="w-4 h-4 text-warning" />;
       case 'under_review':
         return <AlertCircle className="w-4 h-4 text-info" />;
@@ -42,7 +49,7 @@ export function IntentRegistrationList() {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      submitted: 'secondary',
+      pending: 'secondary',
       approved: 'default',
       rejected: 'destructive',
       under_review: 'outline'
@@ -52,6 +59,45 @@ export function IntentRegistrationList() {
         {status.replace('_', ' ')}
       </Badge>
     );
+  };
+
+  const handleDeleteClick = (intentId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIntentToDelete(intentId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!intentToDelete) return;
+    
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('intent_registrations')
+        .delete()
+        .eq('id', intentToDelete);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: 'Intent registration deleted successfully',
+      });
+
+      refetch();
+      setSelectedIntent(null);
+    } catch (error) {
+      console.error('Error deleting intent:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete intent registration',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleting(false);
+      setDeleteDialogOpen(false);
+      setIntentToDelete(null);
+    }
   };
 
   if (loading) {
@@ -78,11 +124,11 @@ export function IntentRegistrationList() {
           All ({intents.length})
         </Button>
         <Button
-          variant={statusFilter === 'submitted' ? 'default' : 'outline'}
-          onClick={() => setStatusFilter('submitted')}
+          variant={statusFilter === 'pending' ? 'default' : 'outline'}
+          onClick={() => setStatusFilter('pending')}
           size="sm"
         >
-          Submitted ({intents.filter(i => i.status === 'submitted').length})
+          Pending ({intents.filter(i => i.status === 'pending').length})
         </Button>
         <Button
           variant={statusFilter === 'under_review' ? 'default' : 'outline'}
@@ -131,6 +177,7 @@ export function IntentRegistrationList() {
                   <TableHead>Location</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Submitted</TableHead>
+                  <TableHead className="w-20">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -180,10 +227,22 @@ export function IntentRegistrationList() {
                         </div>
                       </TableCell>
                       <TableCell>{format(new Date(intent.created_at), 'MMM dd, yyyy')}</TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        {intent.status === 'pending' && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={(e) => handleDeleteClick(intent.id, e)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </TableCell>
                     </TableRow>
                     {selectedIntent === intent.id && selectedIntentData && (
                       <TableRow className="bg-glass/50 backdrop-blur-md hover:bg-glass/50">
-                        <TableCell colSpan={6} className="p-0">
+                        <TableCell colSpan={7} className="p-0">
                           <div className="border-t border-glass/30 bg-white/80 dark:bg-primary/5 backdrop-blur-md p-6 print:border-none print:p-0 print:bg-transparent">
                             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                               <TabsList className="grid w-full grid-cols-2 print:hidden">
@@ -218,9 +277,16 @@ export function IntentRegistrationList() {
                                   <CardTitle className="text-lg">Official Feedback from CEPA</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                   {selectedIntentData.status === 'submitted' ? (
+                                   {selectedIntentData.status === 'pending' ? (
                                     <Alert>
                                       <Clock className="h-4 w-4" />
+                                      <AlertDescription>
+                                        Your submission is pending review. Any feedback from CEPA will be displayed here once the review begins.
+                                      </AlertDescription>
+                                    </Alert>
+                                  ) : selectedIntentData.status === 'under_review' ? (
+                                    <Alert>
+                                      <AlertCircle className="h-4 w-4" />
                                       <AlertDescription>
                                         Your submission is currently under review. Any feedback from CEPA will be displayed here once the review is complete.
                                       </AlertDescription>
@@ -296,6 +362,27 @@ export function IntentRegistrationList() {
           </Card>
         </div>
       )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Intent Registration</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this intent registration? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
