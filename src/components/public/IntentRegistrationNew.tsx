@@ -166,7 +166,7 @@ export function IntentRegistrationNew() {
       const { data, error } = await supabase
         .from('intent_registrations')
         .insert({
-          user_id: user.id,
+          user_id: user?.id,
           entity_id: formData.entity_id,
           activity_level: formData.activity_level,
           activity_description: formData.activity_description,
@@ -174,8 +174,8 @@ export function IntentRegistrationNew() {
           commencement_date: formData.commencement_date,
           completion_date: formData.completion_date,
           project_site_address: formData.project_site_address,
-          district: formData.district || null,
-          province: formData.province || null,
+          district: formData.district,
+          province: formData.province,
           project_site_description: formData.project_site_description,
           site_ownership_details: formData.site_ownership_details,
           government_agreement: formData.government_agreement,
@@ -193,28 +193,23 @@ export function IntentRegistrationNew() {
 
       if (error) throw error;
 
-      // Create notification for registry staff unit
-      try {
-        const { error: notifError } = await supabase
-          .from('manager_notifications')
+      // Create notification for registry unit
+      if (data) {
+        const entityData = entities.find(e => e.id === formData.entity_id);
+        await supabase
+          .from('manager_notifications' as any)
           .insert({
-            target_unit: 'registry',
-            type: 'intent_submitted',
-            message: `New intent registration submitted for ${formData.activity_description}. Entity: ${entities.find(e => e.id === formData.entity_id)?.name || 'Unknown'}. Please review and process the application.`,
-            metadata: {
-              intent_id: data.id,
-              entity_id: formData.entity_id,
-              activity_level: formData.activity_level,
-            },
+            type: 'new_intent_submission',
+            message: `New intent registration submitted by ${entityData?.name || 'Unknown Entity'} for ${formData.activity_level}`,
             related_id: data.id,
+            target_unit: 'registry',
             is_read: false,
+            metadata: {
+              entity_name: entityData?.name,
+              activity_level: formData.activity_level,
+              submitted_at: new Date().toISOString()
+            }
           });
-
-        if (notifError) {
-          console.error('Error creating notification:', notifError);
-        }
-      } catch (notifError) {
-        console.error('Error notifying registry staff:', notifError);
       }
 
       // Link uploaded draft documents to the intent
