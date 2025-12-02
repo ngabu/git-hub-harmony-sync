@@ -186,7 +186,7 @@ export function IntentRegistrationNew() {
           prescribed_activity_id: formData.prescribed_activity_id || null,
           existing_permit_id: formData.existing_permit_id || null,
           project_boundary: projectBoundary,
-          status: 'submitted',
+          status: 'pending',
         })
         .select()
         .single();
