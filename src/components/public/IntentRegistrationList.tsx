@@ -261,6 +261,9 @@ export function IntentRegistrationList() {
                                   }}
                                   onCoordinatesChange={() => {}}
                                   readOnly={true}
+                                  district={selectedIntentData.district}
+                                  province={selectedIntentData.province}
+                                  llg={selectedIntentData.llg}
                                 />
                               </TabsContent>
 
