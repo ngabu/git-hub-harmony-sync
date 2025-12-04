@@ -13,8 +13,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { useDocumentCheck } from "@/hooks/useDocumentCheck";
-import { DocumentUploadAlert } from "@/components/shared/DocumentUploadAlert";
 
 interface ComplianceReport {
   id: string;
@@ -39,7 +37,6 @@ interface Permit {
 export function ComplianceReportingView() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { hasDocumentsInManagement } = useDocumentCheck();
   const [reports, setReports] = useState<ComplianceReport[]>([]);
   const [permits, setPermits] = useState<Permit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -195,12 +192,6 @@ export function ComplianceReportingView() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              {!hasDocumentsInManagement && (
-                <DocumentUploadAlert 
-                  message="Consider uploading your compliance report documents to Document Management first for better organization."
-                />
-              )}
-
               <div className="space-y-2">
                 <Label htmlFor="permit">Select Permit *</Label>
                 <Select value={selectedPermit} onValueChange={setSelectedPermit}>
