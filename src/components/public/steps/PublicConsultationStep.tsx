@@ -5,6 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Calendar, Upload, Users, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useDocumentCheck } from '@/hooks/useDocumentCheck';
+import { DocumentUploadAlert } from '@/components/shared/DocumentUploadAlert';
 
 interface PublicConsultationStepProps {
   data: any;
@@ -12,6 +14,7 @@ interface PublicConsultationStepProps {
 }
 
 export function PublicConsultationStep({ data, onChange }: PublicConsultationStepProps) {
+  const { hasDocumentsInManagement } = useDocumentCheck();
   const isRequired = ['Level 2', 'Level 3'].includes(data.activity_level);
   
   if (!isRequired) {
@@ -186,6 +189,12 @@ export function PublicConsultationStep({ data, onChange }: PublicConsultationSte
         </div>
 
         <div className="space-y-4">
+          {!hasDocumentsInManagement && (
+            <DocumentUploadAlert 
+              message="Consider uploading your consultation documents to Document Management first for better organization and reuse."
+            />
+          )}
+
           <div>
             <Label className="text-base font-medium">Public Consultation Evidence *</Label>
             <p className="text-sm text-muted-foreground mb-3">
