@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Upload, FileText, X, Loader2, CheckCircle, Info, Replace } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
+import { useDocumentCheck } from '@/hooks/useDocumentCheck';
+import { DocumentUploadAlert } from '@/components/shared/DocumentUploadAlert';
 
 interface DocumentsTabProps {
   formData: any;
@@ -47,6 +49,7 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
   permitId
 }) => {
   const { documents, loading, uploadDocument, deleteDocument } = useDocuments(permitId);
+  const { hasDocumentsInManagement, loading: checkingDocs } = useDocumentCheck();
   const [uploadingType, setUploadingType] = useState<string | null>(null);
 
   // Track uploaded documents by type using formData
@@ -168,6 +171,12 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {!checkingDocs && !hasDocumentsInManagement && (
+          <DocumentUploadAlert 
+            message="Before uploading documents here, please ensure your documents are organized in Document Management for easy reference and reuse."
+          />
+        )}
+
         {!allMandatoryUploaded && (
           <Alert variant="destructive">
             <Info className="h-4 w-4" />
