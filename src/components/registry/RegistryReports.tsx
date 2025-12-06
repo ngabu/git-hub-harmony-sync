@@ -163,12 +163,11 @@ const RegistryReports = () => {
 
       {/* Report Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="assessments">Assessments</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
           <TabsTrigger value="permits">Permits</TabsTrigger>
-          <TabsTrigger value="compliance">Compliance</TabsTrigger>
+          <TabsTrigger value="staff-performance">Staff Performance</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -571,51 +570,6 @@ const RegistryReports = () => {
           </Card>
         </TabsContent>
 
-        {/* Performance Tab */}
-        <TabsContent value="performance" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle>Officer Performance Report</CardTitle>
-                  <CardDescription>Individual performance metrics and workload</CardDescription>
-                </div>
-                <ReportActions reportName="Officer Performance" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {officerPerformance.map((officer, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <Users className="w-5 h-5 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium">{officer.name}</p>
-                          <p className="text-xs text-muted-foreground">Registry Officer</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-8">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-green-600">{officer.completed}</div>
-                        <p className="text-xs text-muted-foreground">Completed</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-amber-600">{officer.pending}</div>
-                        <p className="text-xs text-muted-foreground">Pending</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-600">{officer.avgTime}d</div>
-                        <p className="text-xs text-muted-foreground">Avg Time</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* Permits Tab */}
         <TabsContent value="permits" className="space-y-4">
@@ -857,67 +811,47 @@ const RegistryReports = () => {
           </Card>
         </TabsContent>
 
-        {/* Compliance Tab */}
-        <TabsContent value="compliance" className="space-y-4">
+        {/* Staff Performance Tab */}
+        <TabsContent value="staff-performance" className="space-y-4">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle>Compliance & Statutory Report</CardTitle>
-                  <CardDescription>Regulatory compliance and deadline tracking</CardDescription>
+                  <CardTitle>Staff Performance Report</CardTitle>
+                  <CardDescription>Individual performance metrics and workload</CardDescription>
                 </div>
-                <ReportActions reportName="Compliance Report" />
+                <ReportActions reportName="Staff Performance" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-6 border rounded-lg bg-green-50 dark:bg-green-950/20">
-                  <div className="flex items-center gap-3 mb-4">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                    <div>
-                      <h3 className="font-semibold text-lg">Statutory Compliance</h3>
-                      <p className="text-sm text-muted-foreground">Meeting regulatory requirements</p>
+              <div className="space-y-3">
+                {officerPerformance.map((officer, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <Users className="w-5 h-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium">{officer.name}</p>
+                          <p className="text-xs text-muted-foreground">Registry Officer</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-8">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">{officer.completed}</div>
+                        <p className="text-xs text-muted-foreground">Completed</p>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-amber-600">{officer.pending}</div>
+                        <p className="text-xs text-muted-foreground">Pending</p>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">{officer.avgTime}d</div>
+                        <p className="text-xs text-muted-foreground">Avg Time</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm">On-time Processing</span>
-                      <Badge variant="secondary">96.8%</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Documentation Complete</span>
-                      <Badge variant="secondary">98.2%</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Regulatory Audits Passed</span>
-                      <Badge variant="secondary">100%</Badge>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-6 border rounded-lg bg-amber-50 dark:bg-amber-950/20">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Clock className="w-8 h-8 text-amber-600" />
-                    <div>
-                      <h3 className="font-semibold text-lg">Deadline Tracking</h3>
-                      <p className="text-sm text-muted-foreground">Upcoming critical deadlines</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm">Due This Week</span>
-                      <Badge variant="destructive">23</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Due This Month</span>
-                      <Badge variant="secondary">67</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Overdue</span>
-                      <Badge variant="destructive">5</Badge>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </CardContent>
           </Card>
