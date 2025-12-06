@@ -295,6 +295,10 @@ export default function ManagingDirectorDashboard() {
             {activeTab === 'reports-analysis' && (
               <ReportsAndAnalysis />
             )}
+
+            {activeTab === 'analytics-reporting' && (
+              <ReportsAndAnalysis />
+            )}
           </main>
         </div>
       </div>
