@@ -48,6 +48,7 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
 }) => {
   const { documents, loading, uploadDocument, deleteDocument } = useDocuments(permitId);
   const [uploadingType, setUploadingType] = useState<string | null>(null);
+
   // Track uploaded documents by type using formData
   const getUploadedDocument = (documentTypeId: string): DocumentUploadState | null => {
     const uploaded = formData.document_uploads?.[documentTypeId];
